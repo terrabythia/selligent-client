@@ -2,7 +2,7 @@
 
 namespace Digitaalbedrijf\Selligent\Requests {
     
-    require_once './src/authentication.php';
+    require_once __DIR__ . '/authentication.php';
 
     use GuzzleHttp\Client;
     use GuzzleHttp\Psr7\Request;
