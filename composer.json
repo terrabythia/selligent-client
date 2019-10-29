@@ -1,0 +1,23 @@
+{
+  "name": "digitaalbedrijf/selligent-client",
+  "description": "Selligent Client for Noordhoff / Digitaalbedrijf",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sander Bruggeman",
+      "email": "sanderbruggeman@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Digitaalbedrijf\\Selligent\\": "src/"
+    }
+  },
+  "require": {
+    "lstrojny/functional-php": "^1.9",
+    "guzzlehttp/guzzle": "~6.0",
+    "vlucas/phpdotenv": "^3.6"
+  }
+}
