@@ -2,7 +2,7 @@
 
 A simple library to fetch and sync data from and to Selligent. 
 
-#### Setup
+#### Setup for running the example
  
 - download and install composer in the root directory of this project: https://getcomposer.org/download/
 - run `php composer.phar install` in the root directory
