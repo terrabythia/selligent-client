@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php'; // Autoload files using Composer autoload
-require_once __DIR__ . '/../src/authentication.php';
 require_once __DIR__ . '/../src/requests.php';
 
 use Dotenv\Dotenv;
@@ -29,7 +28,6 @@ $request = selligent_search_profiles_request(
     ['ID' => 0, 'op' => '<>'],
     null
 );
-
 
 try {
     $response = $client->send(

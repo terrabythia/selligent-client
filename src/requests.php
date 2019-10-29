@@ -1,6 +1,8 @@
 <?php
 
 namespace Digitaalbedrijf\Selligent\Requests {
+    
+    require_once './src/authentication.php';
 
     use GuzzleHttp\Client;
     use GuzzleHttp\Psr7\Request;
