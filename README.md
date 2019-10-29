@@ -10,3 +10,6 @@ A simple library to fetch and sync data from and to Selligent.
 - run `php examples/authenticate-and-fetch-profiles.php`. This will show you a JSON response of
  profiles when everything is working and an error when there's still something wrong. See the example for 
  an implementation of this library.
+
+Notes: 
+- the dotenv library is only needed for the example, how and where you store your credentials is all up to you
