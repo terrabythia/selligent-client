@@ -21,6 +21,8 @@ $client = selligent_guzzle_client(
     $baseUrl
 );
 
+$authenticateRequestFn = selligent_authenticated_request($username, $password);
+
 // as a test: search profiles where ID != 0
 // limit parameter not implemented yet
 $request = selligent_search_profiles_request(
@@ -31,7 +33,9 @@ $request = selligent_search_profiles_request(
 
 try {
     $response = $client->send(
-        selligent_authenticated_request($username, $password, $request)
+        $authenticateRequestFn(
+            $request
+        )
     );
     var_dump(json_encode($response->getBody()->getContents()));
 } catch (RequestException $e) {

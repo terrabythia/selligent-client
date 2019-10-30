@@ -4,6 +4,8 @@ namespace Digitaalbedrijf\Selligent\Requests {
     
     require_once __DIR__ . '/authentication.php';
 
+    use function Functional\partial_any;
+    use function Functional\placeholder;
     use GuzzleHttp\Client;
     use GuzzleHttp\Psr7\Request;
     use function Functional\compose;
@@ -12,7 +14,11 @@ namespace Digitaalbedrijf\Selligent\Requests {
     use function Functional\partial_right;
     use function Digitaalbedrijf\Selligent\Authentication\selligent_get_authorization_hash;
 
-    function selligent_transform_stream_request_data(array $data) {
+    /**
+     * @param array $data
+     * @return string
+     */
+    function selligent_transform_stream_request_data(array $data): string {
         if (empty($data)) {
             return "";
         }
@@ -51,14 +57,29 @@ namespace Digitaalbedrijf\Selligent\Requests {
      * @param $username
      * @param $password
      * @param Request $request
-     * @return Request
+     * @return Request|callable (when callable it will return a partially applied function)
      */
-    function selligent_authenticated_request($username, $password, Request $request) {
+    function selligent_authenticated_request(string $username, string $password, ?Request $request = null) {
+        if (!isset($request)) {
+            // return a partial fn
+            return partial_any(
+                'Digitaalbedrijf\\Selligent\\Requests\\selligent_authenticated_request',
+                $username,
+                $password,
+                placeholder()
+            );
+        }
         $authHash = selligent_get_authorization_hash($username, $password, $request->getUri(), $request->getMethod());
         return $request->withAddedHeader('Authorization', $authHash);
     }
 
-    function selligent_request($apiPath, $body = null, $method = 'GET') {
+    /**
+     * @param string $apiPath
+     * @param array|string|null $body
+     * @param string $method
+     * @return Request
+     */
+    function selligent_request(string $apiPath, $body = null, string $method = 'GET'): Request {
         $request = new Request($method, $apiPath, [
             "Content-Type" => "application/json",
             "Accept" => "*/*",
@@ -67,7 +88,12 @@ namespace Digitaalbedrijf\Selligent\Requests {
         return $request;
     }
 
-    function selligent_fetch_list_profiles_request($listId, $fields = []) {
+    /**
+     * @param $listId
+     * @param array $fields
+     * @return Request
+     */
+    function selligent_fetch_list_profiles_request($listId, $fields = []): Request {
         $apiPath = "/restapi/api/async/lists/$listId/profiles";
         if (!empty($fields)) {
             $apiPath = "$apiPath?fields=" . implode(",", $fields);
@@ -79,18 +105,23 @@ namespace Digitaalbedrijf\Selligent\Requests {
         );
     }
 
-    function selligent_fetch_lists_request() {
+    /**
+     * @return Request
+     */
+    function selligent_fetch_lists_request(): Request {
         $apiPath = '/restapi/api/async/lists';
-        $method = 'GET';
         return selligent_request(
             $apiPath,
             null,
-            $method
+            'GET'
         );
     }
 
-
-    function selligent_fetch_list_request($listId) {
+    /**
+     * @param int $listId
+     * @return Request
+     */
+    function selligent_fetch_list_request(int $listId): Request {
         $apiPath = "/restapi/api/async/lists/$listId";
         return selligent_request(
             $apiPath,
@@ -99,7 +130,12 @@ namespace Digitaalbedrijf\Selligent\Requests {
         );
     }
 
-    function selligent_fetch_list_data_request($listId, $fields = []) {
+    /**
+     * @param int $listId
+     * @param array $fields
+     * @return Request
+     */
+    function selligent_fetch_list_data_request(int $listId, array $fields = []): Request {
         $apiPath = "/restapi/api/sync/lists/$listId/data";
         if (!empty($fields)) {
             $apiPath = "$apiPath?fields=" . implode(",", $fields);
@@ -111,7 +147,12 @@ namespace Digitaalbedrijf\Selligent\Requests {
         );
     }
 
-    function selligent_fetch_profile_request($listId, $profileId) {
+    /**
+     * @param int $listId
+     * @param int $profileId
+     * @return Request
+     */
+    function selligent_fetch_profile_request(int $listId, int $profileId): Request {
         $apiPath = "/restapi/api/async/lists/$listId/profiles/$profileId";
         return selligent_request(
             $apiPath,
@@ -120,44 +161,62 @@ namespace Digitaalbedrijf\Selligent\Requests {
         );
     }
 
-    function selligent_create_profile_request($listId, array $body, $async = true) {
+    /**
+     * @param int $listId
+     * @param array $body
+     * @param bool $async
+     * @return Request
+     */
+    function selligent_create_profile_request(int $listId, array $body, bool $async = true): Request {
         $sAsync = $async ? 'async' : 'sync';
         $apiPath = "/restapi/api/{$sAsync}/lists/{$listId}/profiles";
-        $method = "POST";
         return selligent_request(
             $apiPath,
             $body,
-            $method
+            'POST'
         );
     }
 
-    function selligent_create_many_profiles_request($listId, array $profiles) {
-
+    /**
+     * @param int $listId
+     * @param array $profiles
+     * @return Request
+     */
+    function selligent_create_many_profiles_request(int $listId, array $profiles): Request {
         $apiPath = "/restapi/api/stream/lists/{$listId}/profiles/post?mode=append";
-        $method = "POST";
-
         return selligent_request(
             $apiPath,
             selligent_transform_stream_request_data($profiles),
-            $method
+            'POST'
         );
-
     }
 
-    function selligent_delete_profile_request($listId, $profileId, $async = true) {
+    /**
+     * @param int $listId
+     * @param int $profileId
+     * @param bool $async
+     * @return Request
+     */
+    function selligent_delete_profile_request(int $listId, int $profileId, bool $async = true): Request {
         $sAsync = $async ? 'async' : 'sync';
         $apiPath = "/restapi/api/{$sAsync}/lists/{$listId}/profiles/{$profileId}";
-        $method = "DELETE";
         return selligent_request(
             $apiPath,
             null,
-            $method
+            'DELETE'
         );
     }
 
-    function selligent_search_list_request($listType, $listId, array $filter, ?array $fields = [], $limit = 200) {
+    /**
+     * @param string $listType
+     * @param int $listId
+     * @param array $filter
+     * @param array|null $fields
+     * @param int $limit
+     * @return Request
+     */
+    function selligent_search_list_request(string $listType, int $listId, array $filter, ?array $fields = [], $limit = 200): Request {
         $apiPath = "/restapi/api/sync/lists/{$listId}/{$listType}/search";
-        $method = "POST";
         $body = [];
         if (!empty($fields)) {
             $body['fields'] = $fields;
@@ -166,75 +225,115 @@ namespace Digitaalbedrijf\Selligent\Requests {
         return selligent_request(
             $apiPath,
             json_encode($body),
-            $method
+            'POST'
         );
     }
 
-    function selligent_search_profiles_request($listId, array $filter, ?array $fields = [], $limit = 200) {
+    /**
+     * @param int $listId
+     * @param array $filter
+     * @param array|null $fields
+     * @param int $limit
+     * @return Request
+     */
+    function selligent_search_profiles_request(int $listId, array $filter, ?array $fields = [], $limit = 200): Request {
         return selligent_search_list_request('profiles', $listId, $filter, $fields, $limit);
     }
 
-    function selligent_search_data_list_request($listId, array $filter, ?array $fields = [], $limit = 200) {
+    /**
+     * @param int $listId
+     * @param array $filter
+     * @param array|null $fields
+     * @param int $limit
+     * @return Request
+     */
+    function selligent_search_data_list_request(int $listId, array $filter, ?array $fields = [], int $limit = 200): Request {
         return selligent_search_list_request('data', $listId, $filter, $fields, $limit);
     }
 
-    function selligent_update_profile_request($listId, $profileId, array $body, $async = true) {
+    /**
+     * @param int $listId
+     * @param int $profileId
+     * @param array $body
+     * @param bool $async
+     * @return Request
+     */
+    function selligent_update_profile_request(int $listId, int $profileId, array $body, bool $async = true): Request {
         $sAsync = $async ? 'async' : 'sync';
         $apiPath = "/restapi/api/{$sAsync}/lists/{$listId}/profiles/{$profileId}";
-        $method = "PUT";
         return selligent_request(
             $apiPath,
             $body,
-            $method
+            'PUT'
         );
     }
 
-    function selligent_create_data_list_record_request($listId, array $body, $async = true) {
+    /**
+     * @param int $listId
+     * @param array $body
+     * @param bool $async
+     * @return Request
+     */
+    function selligent_create_data_list_record_request(int $listId, array $body, bool $async = true): Request {
         $sAsync = $async ? 'async' : 'sync';
         $apiPath = "/restapi/api/{$sAsync}/lists/{$listId}/data";
-        $method = 'POST';
         return selligent_request(
             $apiPath,
             $body,
-            $method
+            'POST'
         );
     }
 
-    function selligent_create_many_data_list_records_request($listId, array $records) {
+    /**
+     * @param int $listId
+     * @param array $records
+     * @return Request
+     */
+    function selligent_create_many_data_list_records_request(int $listId, array $records): Request {
         $apiPath = "/restapi/api/stream/lists/{$listId}/data/post?mode=append";
-        $method = "POST";
         return selligent_request(
             $apiPath,
             selligent_transform_stream_request_data($records),
-            $method
+            'POST'
         );
     }
 
-    function selligent_update_data_list_record_request($listId, $recordId, array $body, $async = true) {
+    /**
+     * @param int $listId
+     * @param int $recordId
+     * @param array $body
+     * @param bool $async
+     * @return Request
+     */
+    function selligent_update_data_list_record_request(int $listId, int $recordId, array $body, bool $async = true): Request {
         $sAsync = $async ? 'async' : 'sync';
         $apiPath = "/restapi/api/{$sAsync}/lists/{$listId}/data/{$recordId}";
-        $method = 'PUT';
         return selligent_request(
             $apiPath,
             $body,
-            $method
+            'PUT'
         );
     }
 
-    function selligent_delete_data_list_record_request($listId, $recordId, $async = true) {
+    /**
+     * @param int $listId
+     * @param int $recordId
+     * @param bool $async
+     * @return Request
+     */
+    function selligent_delete_data_list_record_request(int $listId, int $recordId, bool $async = true): Request {
         $sAsync = $async ? 'async' : 'sync';
         $apiPath = "/restapi/api/{$sAsync}/lists/{$listId}/data/{$recordId}";
-        $method = "DELETE";
         return selligent_request(
             $apiPath,
             null,
-            $method
+            'DELETE'
         );
     }
 
+
     function selligent_trigger_campaign($campaignId, $actionListId, $userId, $userListId, $actionListRecord = [], $gate = 'POC_GATE') {
         $apiPath = "/restapi/api/async/campaigns/$campaignId/trigger";
-        $method = 'POST';
         return selligent_request(
             $apiPath,
             [
@@ -244,7 +343,7 @@ namespace Digitaalbedrijf\Selligent\Requests {
                 'ActionListRecord' => $actionListRecord,
                 'Gate' => $gate,
             ],
-            $method
+            'POST'
         );
     }
 
