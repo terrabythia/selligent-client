@@ -54,6 +54,7 @@ namespace Digitaalbedrijf\Selligent\Requests {
     }
 
     /**
+     * Todo: make $request optional and make function curryable
      * @param $username
      * @param $password
      * @param Request $request
