@@ -2,7 +2,8 @@
 
 namespace Digitaalbedrijf\Selligent\Authentication {
 
-    function selligent_get_authorization_hash($username, $password, $apiPath, $method = 'GET') {
+    function selligent_get_authorization_hash($username, $password, $apiPath, $method = 'GET')
+    {
 
         $time = time();
 

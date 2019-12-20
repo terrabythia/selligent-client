@@ -3,24 +3,21 @@
 require_once __DIR__ . '/../vendor/autoload.php'; // Autoload files using Composer autoload
 require_once __DIR__ . '/../src/requests.php';
 
-use Dotenv\Dotenv;
 use GuzzleHttp\Exception\RequestException;
 use function Digitaalbedrijf\Selligent\Requests\selligent_authenticated_request;
 use function Digitaalbedrijf\Selligent\Requests\selligent_guzzle_client;
 use function Digitaalbedrijf\Selligent\Requests\selligent_search_profiles_request;
 
-$dotEnv = Dotenv::create(dirname(__DIR__));
-$dotEnv->load();
-
-$username = getenv('SELLIGENT_USERNAME');
-$password = getenv('SELLIGENT_PASSWORD');
-$baseUrl = getenv('SELLIGENT_BASE_URL');
-$selligentProfilesListId = getenv('SELLIGENT_PROFILES_LIST_ID');
+$username = "username";
+$password = "password";
+$baseUrl = "https://baseurl";
+$selligentProfilesListId = "profiles_list_id";
 
 $client = selligent_guzzle_client(
     $baseUrl
 );
 
+// partially apply the selligent authenticate request (see https://github.com/lstrojny/functional-php/blob/master/docs/functional-php.md#partial-application)
 $authenticateRequestFn = selligent_authenticated_request($username, $password);
 
 // as a test: search profiles where ID != 0

@@ -3,6 +3,7 @@
   "description": "Selligent Client for Noordhoff / Digitaalbedrijf",
   "type": "library",
   "license": "MIT",
+  "version": "1.0.1",
   "authors": [
     {
       "name": "Sander Bruggeman",
@@ -19,6 +20,6 @@
     "php": ">=7.1.0",
     "lstrojny/functional-php": "^1.9",
     "guzzlehttp/guzzle": "~6.0",
-    "vlucas/phpdotenv": "^3.6"
+    "ext-json": "*"
   }
 }
